@@ -17,9 +17,9 @@
 
 
 
-void kinit(/*multiboot_info_t* mbdata, unsigned int magic*/){
+void kinit(multiboot_info_t* mbdata, unsigned int magic){
 
 	kvga_init();
 	kvga_clear(kvga_construct_entry('c',BLUE,RED));
-	kvga_put(kvga_construct_entry('X',WHITE,BLACK),79,19);
+	kvga_put(kvga_construct_entry('X',WHITE,BLACK),79,24);
 }

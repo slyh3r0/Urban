@@ -35,7 +35,12 @@ stack_top:
 _start:
 	# Establish early stack
 	movl $stack_top, %esp
+	
+	# Pushing the kinit arguments (multiboot_info_t*,)
+	pushl %ebx
+	pushl %eax
 
+	# C Code entry point
 	call kinit 
 
 	cli
