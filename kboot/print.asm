@@ -1,4 +1,4 @@
-print:
+print: ;Uses si for str_start
     pusha
     mov ah, 0x0e
     str_loop:
@@ -11,3 +11,29 @@ print:
     print_exit:
     popa
 ret
+
+hex: ; Uses dx for the hexadecimal word to print
+	pusha
+	mov ax,3 
+	hex_loop:
+		mov bx,dx
+		and bx,0x000f
+		mov cx,[HEX_TABLE+bx]
+		mov bx,ax
+		mov [bx+HEX_INPRINT],cl
+		cmp ax,0
+		je hex_exit
+		shr dx,4
+		sub ax,1
+		jmp hex_loop
+
+hex_exit:
+	mov si,HEX_INPRINT
+	call print
+	popa
+ret
+
+
+
+HEX_INPRINT: db "****",0x0a,0x0d, 0
+HEX_TABLE: db "0123456789abcdef"

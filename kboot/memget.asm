@@ -1,0 +1,2 @@
+memget:
+	mov 
