@@ -1,39 +1,29 @@
-print: ;Uses si for str_start
-    pusha
-    mov ah, 0x0e
-    str_loop:
-        mov al, [si]
-        cmp al, 0
-        jz print_exit
-        int 0x10
-        add si, 1
-        jmp str_loop
-    print_exit:
-    popa
+print:
+	push rax
+	push rdi
+	
+	mov rdi, VGA_MEM	
+	.printloop:
+		mov al, byte [rsi]
+		cmp al,0
+		jz .printexit
+		mov ah,[DEFAULT_COLOR]
+		mov word [rdi], ax
+		add rdi,2
+		inc rsi
+		jmp .printloop
+
+.printexit:
+	pop rdi
+	pop rax
 ret
 
-hex: ; Uses dx for the hexadecimal word to print
-	pusha
-	mov ax,3 
-	hex_loop:
-		mov bx,dx
-		and bx,0x000f
-		mov cx,[HEX_TABLE+bx]
-		mov bx,ax
-		mov [bx+HEX_INPRINT],cl
-		cmp ax,0
-		je hex_exit
-		shr dx,4
-		sub ax,1
-		jmp hex_loop
-
-hex_exit:
-	mov si,HEX_INPRINT
-	call print
-	popa
-ret
+pinth: ;rsi is the address of bytes to read rcx is the count of bytes to read
+	
 
 
 
-HEX_INPRINT: db "****",0x0a,0x0d, 0
+
 HEX_TABLE: db "0123456789abcdef"
+VGA_MEM equ 0xb8000
+DEFAULT_COLOR: db 0x03

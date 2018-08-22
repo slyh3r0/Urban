@@ -25,7 +25,7 @@ SegZero:
 	int 0x13
 
 	;read secound sector
-	mov al,1
+	mov al,3
 	mov cl,2
 	call read_sectors
 	
@@ -35,15 +35,15 @@ SegZero:
 	je A20enabled ;jmp secound sector
 	
 	mov si,A20_FAIL
-	call print
+	call bios_print
 	mov si,SYSTEM_NEEDS
-	call print
+	call bios_print
 	mov dx,ax
 	call hex
 	jmp $
 
 
-%include "print.asm"
+%include "bios_print.asm"
 %include "read_sectors.asm"
 %include "enableA20.asm"
 
@@ -57,21 +57,36 @@ times 510-($ - $$) db 0
 dw 0xaa55
 ;Secound sector
 
+%include "gdt.asm"
+%include "checkLM.asm"
+%include "memget.asm"
+
+
+
 A20enabled:
 	call checkLM
 	cmp ax,1
 	je LMchecked
 
 	mov si,LM_FAIL
-	call print
+	call bios_print
 	mov si,SYSTEM_NEEDS
-	call print
+	call bios_print
 	mov dx,ax
 	call hex
 	jmp $
 
 LMchecked:
-	
+
+	call memget
+	jnc gotMM
+
+	mov si,SYSTEM_NEEDS
+	call bios_print
+	jmp $
+
+gotMM:
+
 	cli
 	mov edi,0x1000
 	mov cr3,edi
@@ -114,20 +129,21 @@ LMchecked:
 	lgdt [GDT.POINTER]
 	jmp GDT.CODE:LongMode
 
-%include "gdt.asm"
-%include "checkLM.asm"
-
 [bits 64]
 
+%include "print.asm"
+%include "kerm.asm"
+DONE: db "We have reached Longmode now the Kernel will be loaded into place!",0
+
 LongMode:
-	
-	mov rax, 0x0f54
-	mov [VGA_MEM], rax
-	
+
+	mov rsi,DONE
+	call print
+
+
+
+
 	hlt
 	
-
-
-VGA_MEM: equ 0xb8000
-times 1024- ($ - $$) db 0
+times 2048- ($ - $$) db 0
 
