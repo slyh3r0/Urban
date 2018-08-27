@@ -132,7 +132,6 @@ gotMM:
 [bits 64]
 
 %include "print.asm"
-%include "kerm.asm"
 DONE: db "We have reached Longmode now the Kernel will be loaded into place!",0
 
 LongMode:
